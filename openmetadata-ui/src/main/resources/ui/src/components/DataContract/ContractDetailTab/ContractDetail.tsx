@@ -10,14 +10,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import Icon from '@ant-design/icons';
-import { AddOutlined, ExpandMore } from '@mui/icons-material';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Button, Dropdown } from '@openmetadata/ui-core-components';
+import { ChevronDown, Download01, Plus, Settings01 } from '@untitledui/icons';
 import {
   Card,
   Col,
   Divider,
-  Dropdown,
+  Dropdown as AntDropdown,
   MenuProps,
   RadioChangeEvent,
   Row,
@@ -37,11 +36,7 @@ import { ReactComponent as RunIcon } from '../../../assets/svg/ic-circle-pause.s
 import { ReactComponent as ExportIcon } from '../../../assets/svg/ic-export-box.svg';
 import { ReactComponent as ImportIcon } from '../../../assets/svg/ic-import.svg';
 import { ReactComponent as InheritIcon } from '../../../assets/svg/ic-inherit.svg';
-import { ReactComponent as SettingIcon } from '../../../assets/svg/ic-settings-gear.svg';
 import { ReactComponent as DeleteIcon } from '../../../assets/svg/ic-trash.svg';
-import { ReactComponent as ImportIconSelected } from '../../../assets/svg/import-icon-selected.svg';
-import { ReactComponent as ImportIconContract } from '../../../assets/svg/import-icon.svg';
-import { PRIMARY_COLOR } from '../../../constants/Color.constants';
 import {
   ContractImportFormat,
   DataContractMode,
@@ -121,11 +116,6 @@ const ContractDetail: React.FC<{
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [importFormat, setImportFormat] =
     useState<ContractImportFormat>('odcs');
-  const [addContractMenuAnchor, setAddContractMenuAnchor] =
-    useState<null | HTMLElement>(null);
-  const [hoveredAddContractItem, setHoveredAddContractItem] = useState<
-    string | null
-  >(null);
 
   const fetchLatestContractResults = async () => {
     try {
@@ -162,50 +152,6 @@ const ContractDetail: React.FC<{
   }, [latestContractResults]);
 
   const isInheritedContract = Boolean(contract?.inherited);
-  const addContractActionsItems = useMemo(() => {
-    return [
-      {
-        label: t('label.create-contract-with-ui'),
-        key: DATA_CONTRACT_ACTION_DROPDOWN_KEY.CREATE,
-        icon: (
-          <AddOutlined
-            sx={{
-              color:
-                hoveredAddContractItem ===
-                DATA_CONTRACT_ACTION_DROPDOWN_KEY.CREATE
-                  ? PRIMARY_COLOR
-                  : 'inherit',
-            }}
-          />
-        ),
-        testId: 'create-contract-button',
-      },
-      {
-        label: t('label.import-om'),
-        key: DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_OPENMETADATA,
-        icon:
-          hoveredAddContractItem ===
-          DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_OPENMETADATA ? (
-            <ImportIconSelected />
-          ) : (
-            <ImportIconContract />
-          ),
-        testId: 'import-openmetadata-contract-button',
-      },
-      {
-        label: t('label.import-odcs'),
-        key: DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_ODCS,
-        icon:
-          hoveredAddContractItem ===
-          DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_ODCS ? (
-            <ImportIconSelected />
-          ) : (
-            <ImportIconContract />
-          ),
-        testId: 'import-odcs-contract-button',
-      },
-    ];
-  }, [t, hoveredAddContractItem]);
 
   const contractActionsItems: MenuProps['items'] = useMemo(() => {
     return [
@@ -215,7 +161,8 @@ const ContractDetail: React.FC<{
               label: (
                 <div
                   className="contract-action-dropdown-item"
-                  data-testid="contract-edit-button">
+                  data-testid="contract-edit-button"
+                >
                   <EditIcon className="anticon" />
 
                   {t('label.edit')}
@@ -227,7 +174,8 @@ const ContractDetail: React.FC<{
               label: (
                 <div
                   className="contract-action-dropdown-item"
-                  data-testid="contract-run-now-button">
+                  data-testid="contract-run-now-button"
+                >
                   <RunIcon className="anticon" />
 
                   {t('label.run-now')}
@@ -239,7 +187,8 @@ const ContractDetail: React.FC<{
               label: (
                 <div
                   className="contract-action-dropdown-item"
-                  data-testid="import-openmetadata-contract-button">
+                  data-testid="import-openmetadata-contract-button"
+                >
                   <ImportIcon className="anticon" />
 
                   {t('label.import')}
@@ -251,7 +200,8 @@ const ContractDetail: React.FC<{
               label: (
                 <div
                   className="contract-action-dropdown-item"
-                  data-testid="import-odcs-contract-button">
+                  data-testid="import-odcs-contract-button"
+                >
                   <ImportIcon className="anticon" />
 
                   {t('label.import-odcs')}
@@ -265,7 +215,8 @@ const ContractDetail: React.FC<{
         label: (
           <div
             className="contract-action-dropdown-item"
-            data-testid="export-contract-button">
+            data-testid="export-contract-button"
+          >
             <ExportIcon className="anticon" />
 
             {t('label.export')}
@@ -277,7 +228,8 @@ const ContractDetail: React.FC<{
         label: (
           <div
             className="contract-action-dropdown-item"
-            data-testid="export-odcs-contract-button">
+            data-testid="export-odcs-contract-button"
+          >
             <ExportIcon className="anticon" />
 
             {t('label.export-odcs')}
@@ -301,7 +253,8 @@ const ContractDetail: React.FC<{
                     isInheritedContract
                       ? t('message.inherited-contract-cannot-be-deleted')
                       : undefined
-                  }>
+                  }
+                >
                   <DeleteIcon className="anticon" />
 
                   {t('label.delete')}
@@ -387,17 +340,8 @@ const ContractDetail: React.FC<{
     }
   };
 
-  const handleAddContractMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAddContractMenuAnchor(event.currentTarget);
-  };
-
-  const handleAddContractMenuClose = () => {
-    setAddContractMenuAnchor(null);
-  };
-
   const handleAddContractAction = useCallback(
-    (key: string) => {
-      handleAddContractMenuClose();
+    (key: string | number) => {
       switch (key) {
         case DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_ODCS:
           return handleImportContract('odcs');
@@ -470,12 +414,14 @@ const ContractDetail: React.FC<{
           align="middle"
           className="w-full"
           gutter={[0, 4]}
-          justify="space-between">
+          justify="space-between"
+        >
           <Col span={20}>
             <div className="d-flex items-center gap-2">
               <Typography.Text
                 className="contract-title"
-                data-testid="contract-title">
+                data-testid="contract-title"
+              >
                 {getEntityName(contract)}
               </Typography.Text>
               {(contract as ContractWithInheritance & { inherited?: boolean })
@@ -483,7 +429,8 @@ const ContractDetail: React.FC<{
                 <Tooltip
                   title={t('label.inherited-entity', {
                     entity: t('label.contract'),
-                  })}>
+                  })}
+                >
                   <InheritIcon
                     className="inherit-icon cursor-pointer"
                     width={16}
@@ -499,7 +446,7 @@ const ContractDetail: React.FC<{
                 mode={mode}
               />
 
-              <Dropdown
+              <AntDropdown
                 destroyPopupOnHide
                 getPopupContainer={getPopupContainer}
                 menu={{
@@ -509,15 +456,16 @@ const ContractDetail: React.FC<{
                 overlayClassName="contract-action-dropdown"
                 overlayStyle={{ width: 180 }}
                 placement="bottomRight"
-                trigger={['click']}>
+                trigger={['click']}
+              >
                 <Button
                   className="contract-action-button"
+                  color="secondary"
                   data-testid="manage-contract-actions"
-                  startIcon={<Icon component={SettingIcon} />}
-                  title={t('label.contract')}
-                  variant="text"
+                  iconLeading={Settings01}
+                  size="sm"
                 />
-              </Dropdown>
+              </AntDropdown>
             </div>
           </Col>
           <Col className="d-flex items-center gap-2 flex-wrap" span={24}>
@@ -526,7 +474,8 @@ const ContractDetail: React.FC<{
                 <div className="d-flex items-center">
                   <Typography.Text
                     className="contract-sub-header-title"
-                    data-testid="contract-created-by-label">
+                    data-testid="contract-created-by-label"
+                  >
                     {`${t('label.created-by')} : `}
                   </Typography.Text>
 
@@ -549,13 +498,15 @@ const ContractDetail: React.FC<{
                 <div className="d-flex items-center">
                   <Typography.Text
                     className="contract-sub-header-title"
-                    data-testid="contract-created-at-label">
+                    data-testid="contract-created-at-label"
+                  >
                     {`${t('label.created-at')} : `}
                   </Typography.Text>
 
                   <Typography.Text
                     className="contract-sub-header-value"
-                    data-testid="contract-created-at-value">
+                    data-testid="contract-created-at-value"
+                  >
                     {formatDateTime(contract.createdAt)}
                   </Typography.Text>
                 </div>
@@ -570,7 +521,8 @@ const ContractDetail: React.FC<{
             <div className="d-flex items-center">
               <Typography.Text
                 className="contract-sub-header-title"
-                data-testid="contract-version-label">
+                data-testid="contract-version-label"
+              >
                 {`${t('label.version')} : `}
               </Typography.Text>
 
@@ -586,7 +538,8 @@ const ContractDetail: React.FC<{
             <div className="d-flex items-center">
               <Typography.Text
                 className="contract-sub-header-title"
-                data-testid="contract-status-label">
+                data-testid="contract-status-label"
+              >
                 {`${t('label.status')} : `}
               </Typography.Text>
 
@@ -602,10 +555,12 @@ const ContractDetail: React.FC<{
 
             <div
               className="d-flex items-center"
-              data-testid="contract-owner-card">
+              data-testid="contract-owner-card"
+            >
               <Typography.Text
                 className="contract-sub-header-title"
-                data-testid="contract-status-label">
+                data-testid="contract-status-label"
+              >
                 {`${t('label.owner-plural')} : `}
               </Typography.Text>
 
@@ -636,7 +591,8 @@ const ContractDetail: React.FC<{
           icon={
             <EmptyContractIcon className="empty-contract-icon" height={140} />
           }
-          type={ERROR_PLACEHOLDER_TYPE.MUI_CREATE}>
+          type={ERROR_PLACEHOLDER_TYPE.MUI_CREATE}
+        >
           <Typography.Paragraph className="m-t-md w-80" type="secondary">
             {t('message.no-contract-description')}
           </Typography.Paragraph>
@@ -660,97 +616,48 @@ const ContractDetail: React.FC<{
           icon={
             <EmptyContractIcon className="empty-contract-icon" height={140} />
           }
-          type={ERROR_PLACEHOLDER_TYPE.MUI_CREATE}>
+          type={ERROR_PLACEHOLDER_TYPE.MUI_CREATE}
+        >
           <Typography.Paragraph className="m-t-md w-80" type="secondary">
             {t('message.create-contract-description')}
           </Typography.Paragraph>
 
-          <>
+          <Dropdown.Root>
             <Button
-              aria-controls={
-                addContractMenuAnchor ? 'add-contract-menu' : undefined
-              }
-              aria-expanded={addContractMenuAnchor ? 'true' : 'false'}
-              aria-haspopup="true"
+              color="primary"
               data-testid="add-contract-button"
-              endIcon={<ExpandMore />}
+              iconTrailing={ChevronDown}
               id="add-contract-button"
-              sx={{ marginTop: 2 }}
-              variant="contained"
-              onClick={handleAddContractMenuOpen}>
+            >
               {t('label.add-entity', { entity: t('label.contract') })}
             </Button>
-            <Menu
-              anchorEl={addContractMenuAnchor}
-              aria-labelledby="add-contract-button"
-              data-testid="add-contract-menu"
-              id="add-contract-menu"
-              open={Boolean(addContractMenuAnchor)}
-              sx={{
-                '& .MuiPaper-root': {
-                  borderRadius: '8px',
-                  border: '1px solid var(--grey-15)',
-                  boxShadow: 'var(--button-box-shadow-default)',
-                  whiteSpace: 'nowrap',
-                  width: 'auto',
-                  minWidth: 'auto',
-                },
-
-                '& .MuiMenu-list': {
-                  padding: 0,
-                },
-
-                '& .MuiMenuItem-root': {
-                  padding: '10px 0',
-                  minHeight: 'auto',
-                  margin: 0,
-
-                  '& .contract-action-dropdown-item': {
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: 'var(--grey-700)',
-                    padding: '0 16px',
-
-                    '& svg': {
-                      width: '16px',
-                      height: '16px',
-                      color: 'var(--grey-700)',
-                    },
-                  },
-
-                  '&:hover': {
-                    backgroundColor: '#f5faff',
-
-                    '& .contract-action-dropdown-item': {
-                      color: '#1570ef',
-
-                      '& svg': {
-                        color: '#1570ef',
-                      },
-                    },
-                  },
-                },
-              }}
-              onClose={handleAddContractMenuClose}>
-              {addContractActionsItems.map((item) => (
-                <MenuItem
-                  data-testid={item.testId}
-                  key={item.key}
-                  onClick={() => handleAddContractAction(item.key as string)}
-                  onMouseEnter={() => setHoveredAddContractItem(item.key)}
-                  onMouseLeave={() => setHoveredAddContractItem(null)}>
-                  <span className="contract-action-dropdown-item">
-                    {item.icon}
-                    {item.label}
-                  </span>
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                data-testid="add-contract-menu"
+                id="add-contract-menu"
+                onAction={(key) => handleAddContractAction(key)}
+              >
+                <Dropdown.Item
+                  data-testid="create-contract-button"
+                  icon={Plus}
+                  id={DATA_CONTRACT_ACTION_DROPDOWN_KEY.CREATE}
+                  label={t('label.create-contract-with-ui')}
+                />
+                <Dropdown.Item
+                  data-testid="import-openmetadata-contract-button"
+                  icon={Download01}
+                  id={DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_OPENMETADATA}
+                  label={t('label.import-om')}
+                />
+                <Dropdown.Item
+                  data-testid="import-odcs-contract-button"
+                  icon={Download01}
+                  id={DATA_CONTRACT_ACTION_DROPDOWN_KEY.IMPORT_ODCS}
+                  label={t('label.import-odcs')}
+                />
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown.Root>
         </ErrorPlaceHolder>
       </>
     );
@@ -771,7 +678,8 @@ const ContractDetail: React.FC<{
       <Card
         className="contract-card-container"
         style={{ marginBottom: 16 }}
-        title={renderDataContractHeader}>
+        title={renderDataContractHeader}
+      >
         {mode === DataContractMode.YAML ? (
           <ContractYaml contract={contract} />
         ) : (
@@ -824,7 +732,8 @@ const ContractDetail: React.FC<{
                 <Tooltip
                   title={t('label.inherited-entity', {
                     entity: t('label.terms-of-service'),
-                  })}>
+                  })}
+                >
                   <InheritIcon
                     className="inherit-icon cursor-pointer"
                     width={14}
@@ -860,7 +769,8 @@ const ContractDetail: React.FC<{
               <Col
                 className="contract-card-items"
                 data-testid="schema-table-card"
-                span={24}>
+                span={24}
+              >
                 <div className="contract-card-header-container">
                   <Typography.Text className="contract-card-header">
                     {t('label.schema')}
@@ -885,7 +795,8 @@ const ContractDetail: React.FC<{
                   <Tooltip
                     title={t('label.inherited-entity', {
                       entity: t('label.security'),
-                    })}>
+                    })}
+                  >
                     <InheritIcon
                       className="inherit-icon cursor-pointer"
                       width={14}
@@ -897,7 +808,8 @@ const ContractDetail: React.FC<{
                   <Col
                     className="contract-card-items"
                     data-testid="security-card"
-                    span={24}>
+                    span={24}
+                  >
                     <div className="contract-card-header-container">
                       <div className="d-flex items-center gap-1">
                         <Typography.Text className="contract-card-header">
@@ -918,7 +830,8 @@ const ContractDetail: React.FC<{
               <Col
                 className="contract-card-items"
                 data-testid="semantics-card"
-                span={24}>
+                span={24}
+              >
                 <div className="contract-card-header-container">
                   <Typography.Text className="contract-card-header">
                     {t('label.semantic-plural')}
@@ -939,7 +852,8 @@ const ContractDetail: React.FC<{
               <Col
                 className="contract-card-items"
                 data-testid="data-quality-card"
-                span={24}>
+                span={24}
+              >
                 <div className="contract-card-header-container">
                   <Typography.Text className="contract-card-header">
                     {t('label.quality')}
@@ -959,7 +873,8 @@ const ContractDetail: React.FC<{
               <Col
                 className="contract-card-items"
                 data-testid="schema-table-card"
-                span={24}>
+                span={24}
+              >
                 <div className="contract-card-header-container">
                   <Typography.Text className="contract-card-header">
                     {t('label.execution-history')}
