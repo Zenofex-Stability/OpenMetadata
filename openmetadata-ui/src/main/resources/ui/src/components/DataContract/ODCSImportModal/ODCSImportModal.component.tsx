@@ -41,6 +41,7 @@ import { isEmpty } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloudUpload } from '../../../assets/svg/upload-cloud.svg';
+import Loader from '../../common/Loader/Loader';
 import { CreateDataContract } from '../../../generated/api/data/createDataContract';
 import { DataContract } from '../../../generated/entity/data/dataContract';
 import { ContractValidation } from '../../../generated/entity/datacontract/contractValidation';
