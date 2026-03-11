@@ -986,6 +986,7 @@ const ContractImportModal: React.FC<ContractImportModalProps> = ({
             className={`import-mode-option${
               importMode === 'merge' ? ' selected' : ''
             }`}
+            data-testid="import-mode-merge"
             onClick={() => setImportMode('merge')}
           >
             <div className="tw:flex tw:justify-between tw:items-start">
@@ -1004,6 +1005,7 @@ const ContractImportModal: React.FC<ContractImportModalProps> = ({
             className={`import-mode-option${
               importMode === 'replace' ? ' selected' : ''
             }`}
+            data-testid="import-mode-replace"
             onClick={() => setImportMode('replace')}
           >
             <div className="tw:flex tw:justify-between tw:items-start">
@@ -1049,7 +1051,14 @@ const ContractImportModal: React.FC<ContractImportModalProps> = ({
               setSelectedObjectName(key ? String(key) : '')
             }
           >
-            {(item) => <SelectItem id={item.id}>{item.label}</SelectItem>}
+            {(item) => (
+              <SelectItem
+                data-testid={`schema-object-option-${item.id}`}
+                id={item.id}
+              >
+                {item.label}
+              </SelectItem>
+            )}
           </Select>
         </div>
       </div>
